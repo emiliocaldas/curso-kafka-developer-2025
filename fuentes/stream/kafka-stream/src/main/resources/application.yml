@@ -1,0 +1,23 @@
+spring:
+  application:
+    name: kafka-stream
+  kafka:
+    streams:
+      bootstrap-servers: ${KAFKA_HOST:localhost:9092,localhost:9093,localhost:9094}
+      application-id: ${APPLICATION_ID:stream-1}
+      properties:
+        default:
+          key:
+            serde: org.apache.kafka.common.serialization.Serdes$StringSerde
+          value:
+            serde: org.apache.kafka.common.serialization.Serdes$StringSerde
+
+app:
+  topic:
+    input: ${TOPIC:payments}
+    output: ${TOPIC_OUTPUT:payments-output}
+
+logging:
+  level:
+    "[org.springframework.kafka]": DEBUG
+    "[org.apache.kafka]": INFO
