@@ -4,7 +4,7 @@ spring:
   kafka:
     streams:
       bootstrap-servers: ${KAFKA_HOST:localhost:9092,localhost:9093,localhost:9094}
-      application-id: ${APPLICATION_ID:stream-1}
+      application-id: ${APPLICATION_ID:payment-stream-app}
       properties:
         default:
           key:
