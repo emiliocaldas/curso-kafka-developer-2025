@@ -3,6 +3,7 @@ package com.evaluacion.infrastructure.bus.kafka;
 import java.math.BigDecimal;
 
 import org.apache.kafka.common.serialization.Serdes;
+import org.apache.kafka.common.utils.Bytes;
 import org.apache.kafka.streams.KeyValue;
 import org.apache.kafka.streams.StreamsBuilder;
 import org.apache.kafka.streams.kstream.Consumed;
@@ -11,13 +12,15 @@ import org.apache.kafka.streams.kstream.KStream;
 import org.apache.kafka.streams.kstream.KTable;
 import org.apache.kafka.streams.kstream.Materialized;
 import org.apache.kafka.streams.kstream.Named;
-import org.apache.kafka.streams.kstream.Produced;
+import org.apache.kafka.streams.state.KeyValueStore;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.support.serializer.JsonSerde;
 import org.springframework.stereotype.Component;
 
 import com.evaluacion.domain.entity.Pago;
+import com.evaluacion.infrastructure.util.BigDecimalDeserializer;
+import com.evaluacion.infrastructure.util.BigDecimalSerializer;
 
 @Component
 public class PagosTopology {
@@ -38,12 +41,27 @@ public class PagosTopology {
     }
 
     private void procesarPago(KStream<String, Pago> pagoStreams) {
+
         KTable<String, BigDecimal> saldoPagos = pagoStreams.map((key, pago) -> KeyValue.pair(pago.cardId(), pago))
                 .groupByKey(Grouped.with(Serdes.String(), new JsonSerde<>(Pago.class)))
-                .aggregate(() -> BigDecimal.ZERO,
+                .aggregate(() -> BigDecimal.ONE,
                         (aggKey, newValue, aggValue) -> aggValue.add(newValue.accountAmount()),
                         Named.as("saldo_pagos"),
-                        Materialized.as("saldo_pagos"));
+                        Materialized.<String, BigDecimal, KeyValueStore<Bytes, byte[]>>as("saldo_pagos")
+                                .withKeySerde(Serdes.String())
+                                .withValueSerde(
+                                        Serdes.serdeFrom(new BigDecimalSerializer(), new BigDecimalDeserializer())));
+
+//        KTable<String, String> saldoPagosStr = pagoStreams.map((key, pago) -> KeyValue.pair(pago.cardId(), pago))
+//                .groupByKey(Grouped.with(Serdes.String(), new JsonSerde<>(Pago.class)))
+//                .aggregate(() -> "0.0",
+//                        (aggKey, newValue, aggValue) -> BigDecimal.valueOf(Double.parseDouble(aggValue)).add
+//                        (newValue.accountAmount()).toString(),
+//                        Named.as("saldo_pagos"),
+//                        Materialized.as("saldo_pagos"));
+
+//        saldoPagos.toStream()
+//                .print(Printed.<String, BigDecimal>toSysOut().withLabel("saldo_pagos"));
 
         //TODO: verificar si es necesario para guardar el KTable
 //        saldoPagos.toStream()

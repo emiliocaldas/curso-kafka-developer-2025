@@ -5,12 +5,15 @@ spring:
     streams:
       bootstrap-servers: ${KAFKA_HOST:localhost:9092,localhost:9093,localhost:9094}
       application-id: ${APPLICATION_ID:payment-stream-app}
+      #properties:
+        #  default:
+        #    key:
+        #      serde: org.apache.kafka.common.serialization.Serdes$StringSerde
+        #    value:
+        #      serde: org.apache.kafka.common.serialization.Serdes$StringSerde
+    consumer:
       properties:
-        default:
-          key:
-            serde: org.apache.kafka.common.serialization.Serdes$StringSerde
-          value:
-            serde: org.apache.kafka.common.serialization.Serdes$StringSerde
+        "[spring.json.trusted.packages]": "*"
 
 app:
   topic:

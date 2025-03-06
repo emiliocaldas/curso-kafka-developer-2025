@@ -8,11 +8,11 @@ import com.evaluacion.domain.entity.Pago;
 import com.evaluacion.domain.repository.PagoRepository;
 
 @Repository
-public class PagoProducer extends BaseProducer<String, String> implements PagoRepository {
+public class PagoProducer extends BaseProducer<String, Pago> implements PagoRepository {
 
     private final String topic;
 
-    public PagoProducer(KafkaTemplate<String, String> kafkaTemplate,
+    public PagoProducer(KafkaTemplate<String, Pago> kafkaTemplate,
                         @Value("${app.topic.pagos}") String topic) {
         super(kafkaTemplate);
         this.topic = topic;
@@ -21,7 +21,7 @@ public class PagoProducer extends BaseProducer<String, String> implements PagoRe
     @Override
     public void guardarPago(Pago pago) {
 
-        sendToTopic(topic, null, pago.toBusMessage());
+        sendToTopic(topic, null, pago);
     }
 
 }
