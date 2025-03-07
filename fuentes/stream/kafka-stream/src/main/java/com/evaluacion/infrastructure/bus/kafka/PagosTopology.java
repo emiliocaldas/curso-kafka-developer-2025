@@ -12,6 +12,7 @@ import org.apache.kafka.streams.kstream.KStream;
 import org.apache.kafka.streams.kstream.KTable;
 import org.apache.kafka.streams.kstream.Materialized;
 import org.apache.kafka.streams.kstream.Named;
+import org.apache.kafka.streams.kstream.Produced;
 import org.apache.kafka.streams.state.KeyValueStore;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,9 +27,12 @@ import com.evaluacion.infrastructure.util.BigDecimalSerializer;
 public class PagosTopology {
 
     private final String inputTopic;
+    private final String outputTopic;
 
-    public PagosTopology(@Value("${app.topic.input}") String inputTopic) {
+    public PagosTopology(@Value("${app.topic.input}") String inputTopic,
+                         @Value("${app.topic.output}") String outputTopic) {
         this.inputTopic = inputTopic;
+        this.outputTopic = outputTopic;
     }
 
     @Autowired
@@ -44,7 +48,7 @@ public class PagosTopology {
 
         KTable<String, BigDecimal> saldoPagos = pagoStreams.map((key, pago) -> KeyValue.pair(pago.cardId(), pago))
                 .groupByKey(Grouped.with(Serdes.String(), new JsonSerde<>(Pago.class)))
-                .aggregate(() -> BigDecimal.ONE,
+                .aggregate(() -> BigDecimal.ZERO,
                         (aggKey, newValue, aggValue) -> aggValue.add(newValue.accountAmount()),
                         Named.as("saldo_pagos"),
                         Materialized.<String, BigDecimal, KeyValueStore<Bytes, byte[]>>as("saldo_pagos")
@@ -60,12 +64,8 @@ public class PagosTopology {
 //                        Named.as("saldo_pagos"),
 //                        Materialized.as("saldo_pagos"));
 
-//        saldoPagos.toStream()
-//                .print(Printed.<String, BigDecimal>toSysOut().withLabel("saldo_pagos"));
-
-        //TODO: verificar si es necesario para guardar el KTable
-//        saldoPagos.toStream()
-//                .to("payments-output", Produced.with(Serdes.String(), new JsonSerde<>(BigDecimal.class) ));
+        saldoPagos.toStream()
+                .to(outputTopic, Produced.with(Serdes.String(), new JsonSerde<>(BigDecimal.class)));
     }
 
 }
