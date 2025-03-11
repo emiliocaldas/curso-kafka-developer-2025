@@ -1,0 +1,23 @@
+services:
+  kafdrop:
+    image: obsidiandynamics/kafdrop  #wjma90/kafdrop:latest #arm64, for amd64 -> obsidiandynamics/kafdrop
+    container_name: kafdrop
+    hostname: kafdrop
+    ports:
+      - 9900:9000
+    environment:
+      JVM_OPTS: -Xms32M -Xmx64M
+      SERVER_SERVLET_CONTEXTPATH: "/"
+      KAFKA_BROKERCONNECT: b-2.evaluacionkafkacluste.kcge0g.c18.kafka.us-east-1.amazonaws.com:9092,b-1.evaluacionkafkacluste.kcge0g.c18.kafka.us-east-1.amazonaws.com:9092
+    #networks:
+    #  - kafka
+    #profiles:
+    #  - kafka
+
+#networks:
+#  kafka:
+#    name: kafka
+#    ipam:
+#     config:
+#       - subnet: 10.5.0.0/16
+#         gateway: 10.5.0.1
