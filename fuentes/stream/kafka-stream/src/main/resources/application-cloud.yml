@@ -1,0 +1,23 @@
+server:
+  port: ${SERVER_PORT}
+
+spring:
+  application:
+    name: kafka-stream
+  kafka:
+    streams:
+      bootstrap-servers: ${KAFKA_HOST}
+      application-id: ${APPLICATION_ID:payment-stream-app}
+    consumer:
+      properties:
+        "[spring.json.trusted.packages]": "*"
+
+app:
+  topic:
+    input: ${TOPIC:payments}
+    output: ${TOPIC_OUTPUT:payments-output}
+
+logging:
+  level:
+    "[org.springframework.kafka]": INFO
+    "[org.apache.kafka]": INFO

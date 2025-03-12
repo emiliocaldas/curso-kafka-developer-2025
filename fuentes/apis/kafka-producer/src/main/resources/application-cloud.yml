@@ -1,0 +1,26 @@
+server:
+  port: ${SERVER_PORT}
+
+spring:
+  application:
+    name: kafka-producer
+  kafka:
+    bootstrap-servers: ${KAFKA_HOST}
+    producer:
+      security:
+        protocol: ${SECURITY_PROTOCOL:PLAINTEXT}
+      acks: ${ACK:all} # none, one, all (0, 1, -1)
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      properties:
+        "[enable.idempotence]": true
+        "[partitioner.class]": org.apache.kafka.clients.producer.RoundRobinPartitioner # interface: Partitioner
+
+app:
+  topic:
+    pagos: ${TOPIC:payments}
+
+logging:
+  level:
+    "[org.springframework.kafka]": INFO
+    "[org.apache.kafka]": INFO
