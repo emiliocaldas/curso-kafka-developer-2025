@@ -1,0 +1,8 @@
+### Enviar datos de pago al topico payments
+curl -i -X POST -H "Content-type: application/json" http://evaluacion-kafka-balancer-1071034448.us-east-1.elb.amazonaws.com/api/v1/payments -d "{ \"timestamp\": 1742009967, \"card_id\":\"12345678\", \"amount\":50.00, \"type\":\"A\" }"
+curl -i -X POST -H "Content-type: application/json" http://evaluacion-kafka-balancer-1071034448.us-east-1.elb.amazonaws.com/api/v1/payments -d "{ \"timestamp\": 1742011088, \"card_id\":\"12345678\", \"amount\":15.00, \"type\":\"C\" }"
+
+
+### Consultar saldos procesados
+curl -i -X GET http://evaluacion-kafka-balancer-1071034448.us-east-1.elb.amazonaws.com/api/v1/search
+

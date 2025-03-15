@@ -1,4 +1,6 @@
-
+##################################
+# para pruebas en ambiente local #
+##################################
 services:
   zookeeper-1:
     image: confluentinc/cp-zookeeper:7.6.0
